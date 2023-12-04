@@ -1,4 +1,8 @@
 defmodule Task do
+  @moduledoc """
+  https://adventofcode.com/2023/day/2
+  """
+
   @max_red 12
   @max_green 13
   @max_blue 14
@@ -15,6 +19,7 @@ defmodule Task do
     end
   end
 
+  # part 1 solution
   def calculate(input_list) do
     data =
       Enum.map(input_list, fn data_list ->
@@ -34,7 +39,6 @@ defmodule Task do
           blue_amount = round_map["blue"] || 0
 
           if red_amount > @max_red || green_amount > @max_green || blue_amount > @max_blue do
-            IO.inspect(game_list, label: "game_list, with_index")
             :invalid
           else
             :valid
@@ -49,6 +53,54 @@ defmodule Task do
     end)
     |> Enum.map(fn {_list, index} -> index end)
     |> Enum.sum()
+  end
+
+  # part 2 solution
+  def calculate_min_colors(input_list) do
+    data =
+      Enum.map(input_list, fn data_list ->
+        Enum.map(data_list, fn round ->
+          round = String.trim(round)
+        end)
+      end)
+
+    parsed_data = convert_data(data)
+
+    Enum.map(parsed_data, fn list ->
+      [first | rest] = list
+
+      max_colors(first, rest, 1, 1, 1)
+    end)
+    |> Enum.sum()
+  end
+
+  def max_colors(head, [], red, green, blue) do
+    red_amount = head["red"] || 1
+    green_amount = head["green"] || 1
+    blue_amount = head["blue"] || 1
+
+    red = if(red_amount > red, do: red_amount, else: red)
+    green = if(green_amount > green, do: green_amount, else: green)
+    blue = if(blue_amount > blue, do: blue_amount, else: blue)
+
+    IO.inspect(red, label: "red")
+    IO.inspect(green, label: "green")
+    IO.inspect(blue, label: "blue")
+
+    red * green * blue
+  end
+
+  def max_colors(head, tail, red, green, blue) do
+    red_amount = head["red"] || 1
+    green_amount = head["green"] || 1
+    blue_amount = head["blue"] || 1
+
+    red = if(red_amount > red, do: red_amount, else: red)
+    green = if(green_amount > green, do: green_amount, else: green)
+    blue = if(blue_amount > blue, do: blue_amount, else: blue)
+
+    [first | tail] = tail
+    max_colors(first, tail, red, green, blue)
   end
 
   def convert_data(data) do
