@@ -5,7 +5,7 @@ defmodule Day1 do
   Run in the terminal with:
     `iex day1.ex`
 
-  Load example: `Day1.load "input1.txt"`
+  Recompile: `r Day1`
   """
 
   @doc """
@@ -25,6 +25,8 @@ defmodule Day1 do
     end
   end
 
+  # Part 1
+  # 1112031679111 - 222
   def total_distance() do
     {first_historians, second_historians} = load()
     first_historians = Enum.sort(first_historians) |> Enum.map(&String.to_integer(&1))
@@ -35,6 +37,29 @@ defmodule Day1 do
       distance = Kernel.abs(left_number - right_number)
 
       distance
+    end)
+    |> Enum.sum()
+  end
+
+  # Part 2
+  # 416 is too low
+  # 11119678534111 - 222
+  def total_frequency() do
+    {first_historians, second_historians} = load()
+
+    Enum.frequencies_by(
+      first_historians,
+      &Enum.filter(second_historians, fn right -> &1 == right end)
+    )
+    |> Map.to_list()
+    |> Enum.map(fn {similars_left, frequency} ->
+      if length(similars_left) > 0 do
+        similar_left = hd(similars_left) |> String.to_integer()
+
+        frequency * similar_left * length(similars_left)
+      else
+        0
+      end
     end)
     |> Enum.sum()
   end
