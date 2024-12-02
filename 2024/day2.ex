@@ -17,6 +17,7 @@ defmodule Day2 do
     end
   end
 
+  # Part 1
   def count_progressions() do
     reports = load()
 
@@ -51,6 +52,112 @@ defmodule Day2 do
       index <= next_index -> false
       index - next_index > 3 -> false
       true -> decreasing?(next_index, tail)
+    end
+  end
+
+  # Part 2
+  # 550 is too high
+  def count_tolerated_progressions() do
+    reports = load()
+
+    Enum.map(reports, fn level ->
+      maybe_find_tolerated_level(level)
+    end)
+    |> Enum.filter(&(&1 == true))
+    |> length()
+  end
+
+  def maybe_find_tolerated_level(level) do
+    current = hd(level)
+    [next | tail] = tl(level)
+
+    increasing? = tolerated_increasing?(current, next, tail, false)
+    decreasing? = tolerated_decreasing?(current, next, tail, false)
+
+    increasing? || decreasing?
+  end
+
+  def tolerated_increasing?(current, next, [], skipped?) do
+    if skipped? == false do
+      true
+    else
+      cond do
+        current >= next -> false
+        next - current > 3 -> false
+        true -> true
+      end
+    end
+  end
+
+  def tolerated_increasing?(current, next, tail, skipped?) do
+    usual? =
+      cond do
+        current >= next -> false
+        next - current > 3 -> false
+        true -> true
+      end
+
+    pick_next? =
+      cond do
+        skipped? == false and next >= hd(tail) -> false
+        skipped? == false and hd(tail) - next > 3 -> false
+        true -> true
+      end
+
+    pick_current? =
+      cond do
+        skipped? == false and current >= hd(tail) -> false
+        skipped? == false and hd(tail) - current > 3 -> false
+        true -> true
+      end
+
+    case {usual?, pick_next?, pick_current?} do
+      {true, _, _} -> tolerated_increasing?(next, hd(tail), tl(tail), skipped?)
+      {false, true, _} -> tolerated_increasing?(next, hd(tail), tl(tail), true)
+      {false, _, true} -> tolerated_increasing?(current, hd(tail), tl(tail), true)
+      {_, _, _} -> false
+    end
+  end
+
+  def tolerated_decreasing?(current, next, [], skipped?) do
+    if skipped? == false do
+      true
+    else
+      cond do
+        current <= next -> false
+        current - next > 3 -> false
+        true -> true
+      end
+    end
+  end
+
+  def tolerated_decreasing?(current, next, tail, skipped?) do
+    usual? =
+      cond do
+        current <= next -> false
+        current - next > 3 -> false
+        true -> true
+      end
+
+    pick_next? =
+      cond do
+        skipped? == false and next <= hd(tail) -> false
+        skipped? == false and next - hd(tail) > 3 -> false
+        true -> true
+      end
+
+    pick_current? =
+      cond do
+        skipped? == false and current <= hd(tail) -> false
+        skipped? == false and current - hd(tail) > 3 -> false
+        true -> true
+      end
+
+    case {usual?, pick_next?, pick_current?} do
+      {true, _, _} -> tolerated_decreasing?(next, hd(tail), tl(tail), skipped?)
+      {false, true, _} -> tolerated_decreasing?(next, hd(tail), tl(tail), true)
+      {false, _, true} -> tolerated_decreasing?(current, hd(tail), tl(tail), true)
+      {_, _, _} -> false
     end
   end
 end
