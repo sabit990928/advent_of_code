@@ -30,8 +30,9 @@ defmodule Day7 do
         if Enum.any?(updated_equations, fn equation ->
              # Part 2 addition
              # 31304694714407 is too low
-             options = maybe_concat_options(options, equation, [])
-             equation = Enum.reject(equation, &(&1 == "||"))
+             # Wrong approach
+             #  options = maybe_concat_options(options, equation, [])
+             #  equation = Enum.reject(equation, &(&1 == "||"))
 
              accumulator = hd(options)
              has_right_equation?(sum, tl(options), equation, accumulator)
@@ -45,23 +46,6 @@ defmodule Day7 do
     |> Enum.sum()
   end
 
-  def maybe_concat_options([], _, final_options), do: final_options
-  def maybe_concat_options([a], [], final_options), do: final_options ++ [a]
-
-  def maybe_concat_options([a, b | options], ["||" | formula], final_options) do
-    ab = "#{a}#{b}" |> String.to_integer()
-    maybe_concat_options([ab | options], formula, final_options)
-  end
-
-  def maybe_concat_options([a, b, c | options], [operation, "||" | formula], final_options) do
-    bc = "#{b}#{c}" |> String.to_integer()
-    maybe_concat_options([a, bc | options], [operation | formula], final_options)
-  end
-
-  def maybe_concat_options([a | options], [_ | formula], final_options) do
-    maybe_concat_options(options, formula, final_options ++ [a])
-  end
-
   def has_right_equation?(sum, [] = _options, [] = _formula, accumulator) do
     sum == accumulator
   end
@@ -73,6 +57,7 @@ defmodule Day7 do
       case operator do
         "+" -> Kernel.+(a, accumulator)
         "*" -> Kernel.*(a, accumulator)
+        "||" -> "#{accumulator}#{a}" |> String.to_integer()
       end
 
     has_right_equation?(sum, options, formula, accumulator)
@@ -109,4 +94,26 @@ defmodule Day7 do
   # ["||", "+", "||"]
 
   # + || * || concat -> all in the same time as another approach
+
+  # Not needed at all. Made because of my stupidness.
+  # I misread the instruction and made bit of overengineering.
+
+  # BUT: That was really interesting problem to solve.
+  # INSTRUCTION: Concat options first, then make sure that you have right answer.
+  def maybe_concat_options([], _, final_options), do: final_options
+  def maybe_concat_options([a], [], final_options), do: final_options ++ [a]
+
+  def maybe_concat_options([a, b | options], ["||" | formula], final_options) do
+    ab = "#{a}#{b}" |> String.to_integer()
+    maybe_concat_options([ab | options], formula, final_options)
+  end
+
+  def maybe_concat_options([a, b, c | options], [operation, "||" | formula], final_options) do
+    bc = "#{b}#{c}" |> String.to_integer()
+    maybe_concat_options([a, bc | options], [operation | formula], final_options)
+  end
+
+  def maybe_concat_options([a | options], [_ | formula], final_options) do
+    maybe_concat_options(options, formula, final_options ++ [a])
+  end
 end
