@@ -10,6 +10,12 @@ defmodule Day3 do
         |> Enum.map(fn [[_, x, y]] -> String.to_integer(x) * String.to_integer(y) end)
         |> Enum.sum()
 
+        # Write logic to handle multiplies between don't() and do()
+
+        # Take only ones that appear before first `don't()`
+        Regex.scan(~r/mul\([\d+,\d+^\)]*\)*don't()/, body)
+        |> IO.inspect()
+
       {:error, _} ->
         IO.puts("Couldn't open the file.")
     end

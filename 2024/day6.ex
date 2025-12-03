@@ -10,6 +10,8 @@ defmodule Day6 do
     # Make decision to forward and zip/unzip depend on that
     no_guard_map = make_map(map, :up)
 
+    IO.inspect(no_guard_map, label: "no_guard_map", limit: :infinity)
+
     no_guard_map
     |> Enum.map(fn line -> Enum.filter(line, &(&1 == "X")) |> length() end)
     |> Enum.sum()

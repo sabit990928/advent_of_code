@@ -11,22 +11,38 @@ defmodule Day11 do
     # Part 2
     stones = Enum.map(stones, &{String.to_integer(&1), 0})
 
-    tasks = Enum.map(stones, &Task.async(fn -> log_update_the_order([&1], 75, []) end))
-    Task.await_many(tasks, :infinity) |> IO.inspect() |> Enum.sum()
+    # 45-50 starts to be significantly slow. While it's quicker than previous solution.
+    # tasks = Enum.map(stones, &Task.async(fn -> log_update_the_order([&1], 20, []) end))
+    # Task.await_many(tasks, :infinity) |> IO.inspect() |> Enum.sum()
+
+    log_update_the_order(stones, 55, []) |> length()
   end
 
   # Part 2. Slow
-  def log_update_the_order([] = numbers, 1 = _blink_amount, acc), do: length(acc)
+  def log_update_the_order([] = _numbers, 1 = _blink_amount, acc), do: acc
 
-  def log_update_the_order([] = numbers, blink_amount, acc),
-    do: log_update_the_order(acc, blink_amount - 1, [])
+  def log_update_the_order([] = _numbers, blink_amount, acc) do
+    if length(acc) > 200_000 do
+      # IO.inspect(blink_amount)
+      numbers = Enum.chunk_every(acc, 1000)
+
+      tasks =
+        Enum.map(numbers, &Task.async(fn -> log_update_the_order(&1, blink_amount - 1, []) end))
+
+      acc = Task.await_many(tasks, :infinity) |> List.flatten()
+      # IO.inspect(acc, label: "acc after 2000")
+      # log_update_the_order(acc, blink_amount - 2, [])
+    else
+      log_update_the_order(acc, blink_amount - 1, [])
+    end
+  end
 
   def log_update_the_order([{0, _} | rest], blink_amount, acc) do
     log_update_the_order(rest, blink_amount, [{1, 0} | acc])
   end
 
   def log_update_the_order([{stone, times} | rest], blink_amount, acc) do
-    IO.inspect(blink_amount, label: "blink_amount")
+    # IO.inspect(blink_amount, label: "blink_amount")
 
     digits_length =
       ((:math.log10(stone) + :math.log10(2024) * times) |> Float.floor() |> trunc()) + 1
@@ -53,9 +69,9 @@ defmodule Day11 do
 
   # Part 1
   # Sequential way
-  def update_the_order([] = numbers, 1 = _blink_amount, acc), do: length(acc)
+  def update_the_order([] = _numbers, 1 = _blink_amount, acc), do: length(acc)
 
-  def update_the_order([] = numbers, blink_amount, acc),
+  def update_the_order([] = _numbers, blink_amount, acc),
     do: update_the_order(acc, blink_amount - 1, [])
 
   def update_the_order([stone | rest], blink_amount, acc) do

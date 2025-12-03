@@ -54,6 +54,11 @@ defmodule Day8 do
     |> length()
   end
 
+  # TODO: potentially
+  # I'm not handling the same symbol in my line - like in j.
+  # Could it be the reason? Probably no, as I scrolled the input manually.
+  # And my answer is too high, which means that I already have some extra.
+
   # def save_indexes(line_index, x, y, input, acc) do
   # end
 
